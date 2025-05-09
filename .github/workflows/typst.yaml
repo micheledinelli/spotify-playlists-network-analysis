@@ -1,0 +1,23 @@
+name: Build report
+on:
+  push:
+    branches:
+      - docs
+
+jobs:
+  build_typst_documents:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: Jarivanbakel/typst-action@v3
+        with:
+          input_files: docs/main.typ
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+

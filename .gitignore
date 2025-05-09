@@ -1,0 +1,9 @@
+.DS_Store
+venv
+sna
+.vscode
+
+*__pycache__
+
+data/spotify_million_playlist_dataset
+data/graph.pkl
