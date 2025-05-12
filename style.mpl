@@ -1,4 +1,4 @@
-figure.figsize : 6, 4
+figure.figsize : 8, 6
 axes.titlesize : 10
 axes.labelsize : 10
 xtick.labelsize : 8
