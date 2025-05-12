@@ -44,6 +44,13 @@
   set math.vec(delim: "[")
   set math.mat(delim: "[")
 
+  show figure.caption: it => [
+    #align(left)[
+      #it.supplement
+      #context it.counter.display(it.numbering):
+      #it.body]
+  ]
+
   // Title row
   align(center)[
     #block(text(weight: 700, 1.75em, title))
