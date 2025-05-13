@@ -13,18 +13,9 @@
   )
   
   show math.equation: set text(weight: 400)
-  set math.equation(numbering: "(1)")
   show math.equation: set text(font: "New Computer Modern Math")
-  show ref: it => {
-    // provide custom reference for equations
-    if it.element != none and it.element.func() == math.equation {
-      // optional: wrap inside link, so whole label is linked
-      text(rgb("FF0000"))[#lower([#it])]
-    } else {
-      it
-    }
-  }
-
+  set math.equation(numbering: "(1)", supplement: [Eq.])
+  
   set heading(numbering: "1.1")
   show heading: it => {
     [#it]
@@ -44,9 +35,13 @@
   set math.vec(delim: "[")
   set math.mat(delim: "[")
 
+  show figure: it => [
+    #pad(y: 1.25em, it)
+  ]
+
   show figure.caption: it => [
     #align(left)[
-      #it.supplement
+      *#it.supplement*
       #context it.counter.display(it.numbering):
       #it.body]
   ]
