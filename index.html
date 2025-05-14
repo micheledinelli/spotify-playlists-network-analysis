@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>
+      Spotify Artist Co-Occurence Network in User Generated Playlists
+    </title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <label class="theme-toggle">
+      <input type="checkbox" id="themeSwitcher" />
+      <span>Dark Mode</span>
+    </label>
+
+    <h1>Spotify Artist Co-Occurence Network in User Generated Playlists</h1>
+    <svg></svg>
+    <p>
+      Music taste is a sort of a fingerprint that identifies each of us, of
+      course there are people who care more or less about music, but everyone
+      must have a peculiar musical taste that is unique. People tend to group
+      their favorite music in structures the so-called music playlist, list of
+      songs where genres, artists and even musical periods are mixed together
+      forming the aforementioned fingerprint, that belongs to each of us. When
+      we thought about music playlists we realized that there must exist some
+      sort of relationship between artists that share place inside them. The
+      dataset used is the continuation of the RecSys Challenge 2018
+      <a
+        href="https://www.aicrowd.com/challenges/spotify-million-playlist-dataset-challenge/#rules"
+        >[1]</a
+      >
+      and it contains 1,000,000 music playlists, created by users on the Spotify
+      platform between January 2010 and October 2017. The result is a monomodal,
+      undirected and weighted co-occurrence network. Nodes represent artists,
+      edges represent the co-occurrence of artists in the same playlist and edge
+      weights are the product of the artists' frequencies in that playlist. This
+      is a small visualization of a broader study that we did for Social Network
+      Analysis (90730) university course @unibo.
+    </p>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+      const svg = d3.select("svg");
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      const container = svg.append("g");
+
+      svg.call(
+        d3
+          .zoom()
+          .scaleExtent([0.1, 4])
+          .on("zoom", (event) => {
+            container.attr("transform", event.transform);
+          })
+      );
+
+      var link;
+      var colorScale;
+
+      d3.json("graph.json").then((data) => {
+        const links = data.links;
+        const nodes = data.nodes;
+
+        const simulation = d3
+          .forceSimulation(nodes)
+          .force(
+            "link",
+            d3
+              .forceLink(links)
+              .id((d) => d.id)
+              .distance(120)
+          )
+          .force("charge", d3.forceManyBody().strength(-300))
+          .force("center", d3.forceCenter(width / 2, height / 2));
+
+        const maxWeight = d3.max(links, (d) => d.weight || 1);
+
+        const getColorScale = () =>
+          d3
+            .scaleLog()
+            .domain([1, maxWeight])
+            .range([
+              getComputedStyle(document.documentElement).getPropertyValue(
+                "--link-light"
+              ),
+              getComputedStyle(document.documentElement).getPropertyValue(
+                "--link-dark"
+              ),
+            ]);
+
+        colorScale = getColorScale();
+
+        const widthScale = d3
+          .scaleSequential()
+          .domain([1, maxWeight])
+          .range([1, 5]);
+
+        link = container
+          .append("g")
+          .selectAll("line")
+          .data(links)
+          .join("line")
+          .attr("stroke", (d) => colorScale(d.weight || 1))
+          .attr("stroke-width", (d) => widthScale(d.weight || 1));
+
+        themeSwitcher.addEventListener("change", () => {
+          colorScale = getColorScale();
+          link.attr("stroke", (d) => colorScale(d.weight || 1));
+        });
+
+        const label = container
+          .append("g")
+          .selectAll("text")
+          .data(nodes)
+          .join("text")
+          .text((d) => d.id)
+          .attr("text-anchor", "middle")
+          .attr("alignment-baseline", "middle")
+          .call(drag(simulation));
+
+        simulation.on("tick", () => {
+          link
+            .attr("x1", (d) => d.source.x)
+            .attr("y1", (d) => d.source.y)
+            .attr("x2", (d) => d.target.x)
+            .attr("y2", (d) => d.target.y);
+
+          label.attr("x", (d) => d.x).attr("y", (d) => d.y);
+        });
+
+        function drag(simulation) {
+          return d3
+            .drag()
+            .on("start", (event) => {
+              if (!event.active) simulation.alphaTarget(0.3).restart();
+              event.subject.fx = event.subject.x;
+              event.subject.fy = event.subject.y;
+            })
+            .on("drag", (event) => {
+              event.subject.fx = event.x;
+              event.subject.fy = event.y;
+            })
+            .on("end", (event) => {
+              if (!event.active) simulation.alphaTarget(0);
+              event.subject.fx = null;
+              event.subject.fy = null;
+            });
+        }
+      });
+
+      const themeSwitcher = document.getElementById("themeSwitcher");
+      themeSwitcher.addEventListener("change", () => {
+        const isDark = themeSwitcher.checked;
+
+        document.documentElement.style.setProperty(
+          "--bg-color",
+          isDark ? "#111" : "white"
+        );
+        document.documentElement.style.setProperty(
+          "--text-color",
+          isDark ? "white" : "black"
+        );
+        document.documentElement.style.setProperty(
+          "--link-light",
+          isDark ? "#444" : "#ddd"
+        );
+        document.documentElement.style.setProperty(
+          "--link-dark",
+          isDark ? "#fff" : "#000"
+        );
+
+        link.attr("stroke", (d) => colorScale(d.weight || 1));
+      });
+    </script>
+  </body>
+</html>
