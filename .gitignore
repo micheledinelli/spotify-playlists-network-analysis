@@ -5,5 +5,5 @@ sna
 
 *__pycache__
 
-data/spotify_million_playlist_dataset
+data/spotify_million_playlist_dataset*
 data/graph.pkl
