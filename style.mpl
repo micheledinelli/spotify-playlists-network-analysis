@@ -3,8 +3,8 @@ axes.titlesize : 10
 axes.labelsize : 10
 xtick.labelsize : 8
 ytick.labelsize : 8
-legend.fontsize : 12
-legend.title_fontsize : 9
+legend.fontsize : 10
+legend.title_fontsize : 10
 
 axes.facecolor : white
 axes.titleweight : 500
