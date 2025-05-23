@@ -4,7 +4,7 @@
     paper: "a4",
     numbering: "1",
     number-align: center,
-    margin: (x: 2.5cm, y: 3cm),
+    margin: (x: 3cm, y: 3cm),
   )
   set text(
     size: 11pt,
